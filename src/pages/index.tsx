@@ -9,8 +9,10 @@ import fetchBooks from '@/lib/fetch-books';
 import fetchRandomBooks from '@/lib/fetch-random-books';
 
 export const getServerSideProps = async () => {
-  const allBooks = await fetchBooks();
-  const recoBooks = await fetchRandomBooks();
+  const [allBooks, recoBooks] = await Promise.all([
+    fetchBooks(),
+    fetchRandomBooks(),
+  ]);
 
   return {
     props: { allBooks, recoBooks },
