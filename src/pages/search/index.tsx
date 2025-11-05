@@ -1,30 +1,45 @@
 import SearchableLayout from '@/components/searchable-layout';
 import { useRouter } from 'next/router';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import books from '@/mock/books.json';
 import BookItem from '@/components/book-item';
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import {
+  GetServerSidePropsContext,
+  GetStaticPropsContext,
+  InferGetServerSidePropsType,
+  InferGetStaticPropsType,
+} from 'next';
 import fetchBooks from '@/lib/fetch-books';
+import { BookData } from '@/types';
 
-export const getServerSideProps = async (
-  context: GetServerSidePropsContext
-) => {
-  // 현재 브라우저에서 받은 모든 요청에 대한 정보를 알 수 있음
-  // console.log(context);
+// export const getStaticProps = async (context: GetStaticPropsContext) => {
+//   const q = context.query.q;
+//   const books = await fetchBooks(q as string);
+//   return {
+//     props: { books },
+//   };
+// };
 
-  const q = context.query.q;
+// context.query 는 빌드타임에는 받아 올 수 없다.
 
-  // q가 undefined일 수 있으니 단언 해준다.
-  const books = await fetchBooks(q as string);
+export default function Page() {
+  // 그래서 빌드 타임 이후에 받아오는 방법도 사용할 수 있다.
+  // (리액트처럼 패칭 받아오기)
+  const [books, setBooks] = useState<BookData[]>([]);
 
-  return {
-    props: { books },
+  const router = useRouter();
+  const q = router.query.q;
+  const fetchSearchResult = async () => {
+    const data = await fetchBooks(q as string);
+    setBooks(data);
   };
-};
 
-export default function Page({
-  books,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  useEffect(() => {
+    if (q) {
+      fetchSearchResult();
+    }
+  }, [q]);
+
   return (
     <div>
       {books.map((book) => (
