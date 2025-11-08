@@ -2,7 +2,6 @@ import { GetStaticPropsContext, InferGetStaticPropsType } from 'next';
 import style from './[id].module.css';
 import fetchOneBook from '@/lib/fetch-one-book';
 import { useRouter } from 'next/router';
-import { notFound } from 'next/navigation';
 
 // 다이나믹한 페이지라서 getStaticPaths를 해주어야 한다.
 export const getStaticPaths = () => {
@@ -57,8 +56,7 @@ export default function Page({
   // 2. 하지만 진짜 book데이터가 없는 화면에서도 보여지기 때문에 로딩에는 적합하지 않다.
   if (!book) return '문제가 발생했습니다. 다시 시도하세요';
 
-  const { id, title, subTitle, description, author, publisher, coverImgUrl } =
-    book;
+  const { title, subTitle, description, author, publisher, coverImgUrl } = book;
 
   return (
     <div className={style.container}>
