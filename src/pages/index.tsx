@@ -16,8 +16,6 @@ export const getStaticProps = async () => {
 
   return {
     props: { allBooks, recoBooks },
-    // 유통기한 (재검증하다.)
-    revalidate: 3,
   };
 };
 
