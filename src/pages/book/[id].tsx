@@ -12,7 +12,6 @@ export const getStaticPaths = () => {
       { params: { id: '1' } },
       { params: { id: '2' } },
       { params: { id: '3' } },
-      {parmas:{}}
     ],
 
     // blocking (즉시 생성 (Like SSR))
