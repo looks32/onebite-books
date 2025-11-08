@@ -2,6 +2,7 @@ import { GetStaticPropsContext, InferGetStaticPropsType } from 'next';
 import style from './[id].module.css';
 import fetchOneBook from '@/lib/fetch-one-book';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 
 // 다이나믹한 페이지라서 getStaticPaths를 해주어야 한다.
 export const getStaticPaths = () => {
@@ -50,7 +51,26 @@ export default function Page({
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   // 3. 그래서 이렇게 로딩 처리
   const router = useRouter();
-  if (router.isFallback) return '로딩중입니다.';
+
+  // fallback이 true 상태이기 때문에
+  // 미리 불러와진 값이 없으면 데이터가 없는 상태의 페이지를 반환하는 데 (props 데이터가 없는 상태)
+  // 그때는 Head 데이터가 없는 상태로 불러와지기 때문에
+  // 그 전에도 SEO의 최적화를 위해서 미리 데이터를 넣어둔다.
+  if (router.isFallback)
+    return (
+      <>
+        <Head>
+          <title>한입북스</title>
+          <meta property="og:image" content="/thumbnail.png" />
+          <meta property="og:title" content="한입북스" />
+          <meta
+            property="og:description"
+            content="한입 북스에 등록된 도서를 만나보세요."
+          />
+        </Head>
+        <div>'로딩중입니다.'</div>
+      </>
+    );
 
   // 1. fallback:true일때 데이터가 없으면 보여짐
   // 2. 하지만 진짜 book데이터가 없는 화면에서도 보여지기 때문에 로딩에는 적합하지 않다.
@@ -59,19 +79,27 @@ export default function Page({
   const { title, subTitle, description, author, publisher, coverImgUrl } = book;
 
   return (
-    <div className={style.container}>
-      <div
-        className={style.cover_img_container}
-        style={{ backgroundImage: `url('${coverImgUrl}')` }}
-      >
-        <img src={coverImgUrl} />
+    <>
+      <Head>
+        <title>{title}</title>
+        <meta property="og:image" content={coverImgUrl} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+      </Head>
+      <div className={style.container}>
+        <div
+          className={style.cover_img_container}
+          style={{ backgroundImage: `url('${coverImgUrl}')` }}
+        >
+          <img src={coverImgUrl} />
+        </div>
+        <div className={style.title}>{title}</div>
+        <div className={style.subTitle}>{subTitle}</div>
+        <div className={style.author}>
+          {author} | {publisher}
+        </div>
+        <div className={style.description}>{description}</div>
       </div>
-      <div className={style.title}>{title}</div>
-      <div className={style.subTitle}>{subTitle}</div>
-      <div className={style.author}>
-        {author} | {publisher}
-      </div>
-      <div className={style.description}>{description}</div>
-    </div>
+    </>
   );
 }
